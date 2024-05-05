@@ -1,0 +1,36 @@
+﻿using WebApplication2.Repositories;
+
+namespace WebApplication2.Warehouse;
+
+public class WarehouseService : IWarehouseService
+{
+    private IWarehouseRepository _warehouseRepository;
+
+    public WarehouseService(IWarehouseRepository warehouseRepository)
+    {
+        _warehouseRepository = warehouseRepository;
+    }
+
+    public async Task<int?> RegisterProductInWarehouseAsync(WarehouseDto dto)
+    {
+        // Example Flow:
+        // check if product exists else throw NotFoundException
+        // check if warehouse exists else throw NotFoundException
+        // get order if exists else throw NotFoundException
+        const int idOrder = 1;
+        // check if product is already in warehouse else throw ConflictException
+
+        /*var idProductWarehouse = await _warehouseRepository.RegisterProductInWarehouseAsync(
+            idWarehouse: dto.IdWarehouse!.Value,
+            idProduct: dto.IdProduct!.Value,
+            idOrder: idOrder,
+            createdAt: DateTime.UtcNow);*/
+
+        /*if (!idProductWarehouse.HasValue)
+            throw new Exception("Failed to register product in warehouse");
+
+        return idProductWarehouse.Value;*/
+        //TODO
+        return null;
+    }
+}
