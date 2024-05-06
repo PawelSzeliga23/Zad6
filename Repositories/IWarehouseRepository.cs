@@ -4,7 +4,9 @@ namespace WebApplication2.Repositories;
 
 public interface IWarehouseRepository
 {
-    public Task<Product?> GetProductByIdAsync(int id);
     public Task<Models.Warehouse?> GetWarehouseByIdAsync(int id);
-    public Task<Order?> GetOrderByIdAsync(int id, int amount);
+    public Task<bool> CheckIfProductWarehouseRecordExistAsync(int idOrder);
+
+    public Task<int?> RegisterProductInWarehouseAsync(int idWarehouse, int idProduct, int idOrder,
+        DateTime createdAt, int amount, decimal price);
 }

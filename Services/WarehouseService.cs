@@ -1,36 +1,51 @@
 ﻿using WebApplication2.Repositories;
+using WebApplication2.Warehouse;
 
-namespace WebApplication2.Warehouse;
+namespace WebApplication2.Services;
 
 public class WarehouseService : IWarehouseService
 {
     private IWarehouseRepository _warehouseRepository;
+    private IProductRepository _productRepository;
+    private IOrderRepository _orderRepository;
 
-    public WarehouseService(IWarehouseRepository warehouseRepository)
+    public WarehouseService(IWarehouseRepository warehouseRepository, IProductRepository productRepository,
+        IOrderRepository orderRepository)
     {
         _warehouseRepository = warehouseRepository;
+        _productRepository = productRepository;
+        _orderRepository = orderRepository;
     }
 
     public async Task<int?> RegisterProductInWarehouseAsync(WarehouseDto dto)
     {
-        // Example Flow:
-        // check if product exists else throw NotFoundException
-        // check if warehouse exists else throw NotFoundException
-        // get order if exists else throw NotFoundException
-        const int idOrder = 1;
-        // check if product is already in warehouse else throw ConflictException
+        var product = await _productRepository.GetProductByIdAsync(dto.IdProduct ?? 0);
+        var warehouse = await _warehouseRepository.GetWarehouseByIdAsync(dto.IdWarehouse ?? 0);
+        if (dto.Amount <= 0)
+        {
+            throw new ConflictException("Amount must be grater than 0.");
+        }
 
-        /*var idProductWarehouse = await _warehouseRepository.RegisterProductInWarehouseAsync(
+        var order = await _orderRepository.GetOrderByIdAsync(dto.IdProduct ?? 0, dto.Amount ?? 0);
+        if (dto.CreatedAt < order!.DateTime)
+        {
+            throw new ConflictException("Order date is past the request date.");
+        }
+
+        if (await _warehouseRepository.CheckIfProductWarehouseRecordExistAsync(order.IdOrder))
+        {
+            throw new ConflictException("Order is already fulfilled.");
+        }
+
+        decimal price = order.Amount * product!.Price;
+
+        var id = await _warehouseRepository.RegisterProductInWarehouseAsync(
             idWarehouse: dto.IdWarehouse!.Value,
             idProduct: dto.IdProduct!.Value,
-            idOrder: idOrder,
-            createdAt: DateTime.UtcNow);*/
-
-        /*if (!idProductWarehouse.HasValue)
-            throw new Exception("Failed to register product in warehouse");
-
-        return idProductWarehouse.Value;*/
-        //TODO
-        return null;
+            idOrder: order.IdOrder,
+            createdAt: DateTime.Now,
+            amount: dto.Amount!.Value,
+            price: price);
+        return id;
     }
 }
