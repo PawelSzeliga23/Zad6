@@ -48,4 +48,11 @@ public class WarehouseService : IWarehouseService
             price: price);
         return id;
     }
+
+    public async Task RegisterProductInWarehouseProcedureAsync(WarehouseDto dto)
+    {
+        await _warehouseRepository.RegisterProductInWarehouseByProcedureAsync(dto.IdWarehouse ?? 0,
+            dto.IdProduct ?? 0, dto.Amount ?? 0,
+            DateTime.Now);
+    }
 }

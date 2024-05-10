@@ -9,4 +9,6 @@ public interface IWarehouseRepository
 
     public Task<int?> RegisterProductInWarehouseAsync(int idWarehouse, int idProduct, int idOrder,
         DateTime createdAt, int amount, decimal price);
+
+    public Task RegisterProductInWarehouseByProcedureAsync(int idWarehouse, int idProduct, int amount, DateTime createdAt);
 }

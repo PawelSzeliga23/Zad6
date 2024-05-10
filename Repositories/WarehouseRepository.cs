@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 using WebApplication2.Warehouse;
 
 namespace WebApplication2.Repositories;
@@ -38,7 +39,6 @@ public class WarehouseRepository : IWarehouseRepository
         {
             throw new NotFoundException($"Warehouse with id: {id} not found");
         }
-        
     }
 
     public async Task<bool> CheckIfProductWarehouseRecordExistAsync(int idOrder)
@@ -93,5 +93,18 @@ public class WarehouseRepository : IWarehouseRepository
             await transaction.RollbackAsync();
             return null;
         }
+    }
+
+    public async Task RegisterProductInWarehouseByProcedureAsync(int idWarehouse, int idProduct, int amount, DateTime createdAt)
+    {
+        await using var connection = new SqlConnection(_configuration["ConnectionStrings:DefaultConnection"]);
+        await connection.OpenAsync();
+        await using var command = new SqlCommand("AddProductToWarehouse", connection);
+        command.CommandType = CommandType.StoredProcedure;
+        command.Parameters.AddWithValue("IdProduct", idProduct);
+        command.Parameters.AddWithValue("IdWarehouse", idWarehouse);
+        command.Parameters.AddWithValue("Amount", amount);
+        command.Parameters.AddWithValue("CreatedAt", createdAt);
+        await command.ExecuteNonQueryAsync();
     }
 }
